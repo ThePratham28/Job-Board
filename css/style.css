@@ -18,12 +18,12 @@ body {
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    cursor: pointer;
 }
 
 button {
     background-color: lightblue;
     color: black;
-    border: none;
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
