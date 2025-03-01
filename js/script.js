@@ -17,46 +17,39 @@ const fetchJobPost = async (jobID) => {
         );
         const jobPost = await data.json();
         return jobPost;
-    }
-    catch (err) {
+    } catch (err) {
         console.error("Error occured while fetching job post:", err);
     }
-}
+};
 
-//   {
-//     by: 'TheBengaluruGuy',
-//     id: 43043441,
-//     score: 1,
-//     time: 1739494807,
-//     title: 'Doctor Droid (YC W23) Is Hiring a Back End Engineer',        
-//     type: 'job',
-//     url: 'https://www.ycombinator.com/companies/doctor-droid/jobs/F0iI9UU-backend-engineer-assignment-in-description'
-//   },
+async function displayJobs(index = 0, count = 9) {
+    const jobIds = await fetchJobPostIDs();
 
-const displayJobPosts = async (index = 0, posts = 9) => {
-    const jobIDs = await fetchJobPostIDs();
-    const jobPosts = [];
-    for (let i = index; i < index + posts; i++) {
-        const jobPost = await fetchJobPost(jobIDs[i]);
-        jobPosts.push(jobPost);
-    }
+    const jobsPosts = jobIds.slice(index, index + count).map(fetchJobPost);
 
-    jobPosts.forEach((post) => {
-        const jobPost = document.getElementById("job-posts").innerHTML +=  `
-        <div class="job-card" onclick="window.open('${post.url}', '_blank')">
-            <h3>${post.title}</h3>
-            <p>${time}
-            `
-        
+    const jobs = await Promise.all(jobsPosts);
+
+    jobs.forEach((job) => {
+        const companyName = job.title.split("Is hiring")[0].trim();
+        const desc = job.title;
+        const date = new Date(job.time * 1000).toLocaleDateString();
+        const jobUrl =
+            job.url || `https://news.ycombinator.com/item?id=${job.id}`;
+
+        document.getElementById("job-posts").innerHTML += `
+            <div class="job-card" onclick="window.open('${jobUrl}', '_blank')">
+                <h3>${companyName}</h3>
+                <p>${desc}</p>
+                <p>${date}</p>
+            </div>
+        `;
     });
-            
 }
 
+let index = 9;
+document.getElementById("load-more").addEventListener("click", () => {
+    displayJobs(index, 6);
+    index += 6;
+});
 
-
-
-
-
-
-
-
+displayJobs(0, 9);
